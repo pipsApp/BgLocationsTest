@@ -1,5 +1,8 @@
 package com.example.bglocations.worker
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
@@ -49,14 +52,9 @@ class LocationCoroutineWorker @AssistedInject constructor(
     }
 
     private fun createForegroundInfo(): ForegroundInfo {
-        val notification = NotificationCompat.Builder(appContext, locationUpdatesChannelId)
-            .setContentText("Requesting location updates")
-            .setOngoing(true)
-            .setVibrate(longArrayOf(0))
-            .setLocalOnly(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .build()
+        Log.d(TAG, "createForegroundInfo")
+        createNotifChannel()
+        val notification = createNotification()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(locationUpdatesNotificationId, notification,
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
@@ -64,6 +62,32 @@ class LocationCoroutineWorker @AssistedInject constructor(
             ForegroundInfo(locationUpdatesNotificationId, notification)
         }
     }
+
+    private fun createNotifChannel() {
+        Log.d(TAG, "createNotifChannel")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            (appContext.getSystemService(
+                Context.NOTIFICATION_SERVICE) as NotificationManager).run {
+                createNotificationChannel(NotificationChannel(
+                    locationUpdatesChannelId,
+                    "Location Updates",
+                    NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = "This is channel 1"
+                })
+            }
+        }
+    }
+
+    private fun createNotification(): Notification =
+        NotificationCompat.Builder(appContext, locationUpdatesChannelId)
+            .setContentText("Requesting location updates")
+            .setOngoing(true)
+            .setVibrate(longArrayOf(0))
+            .setLocalOnly(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
+            .build()
 
     companion object {
         private const val TAG = "LocationCoroutineWorker"
@@ -85,10 +109,10 @@ class LocationCoroutineWorker @AssistedInject constructor(
             //Take into consideration that a retry will only happen if you specify that the Work requires it
             // by returning WorkerResult.RETRY
             val workRequest: PeriodicWorkRequest =
-                PeriodicWorkRequestBuilder<LocationCoroutineWorker>(1, TimeUnit.HOURS)
+                PeriodicWorkRequestBuilder<LocationCoroutineWorker>(
+                    PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
                     .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
-                    .setConstraints(Constraints.Builder()
-                        .build())
+                    .setConstraints(Constraints.Builder().build())
                     .build()
 
             //Enqueue work
