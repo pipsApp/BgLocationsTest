@@ -1,6 +1,7 @@
 package com.example.bglocations.location
 
 import android.Manifest.permission
+import android.app.PendingIntent
 import android.location.Location
 import android.os.Looper
 import android.util.Log
@@ -103,6 +104,12 @@ class GooglePlayServicesLocationProvider(
                 }
         }
 
+    @RequiresPermission(
+        anyOf = [permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION])
+    fun requestLocationUpdatesViaBroadcastReceiver(pendingIntent: PendingIntent) {
+        Log.d(TAG, "requestLocationUpdatesViaBroadcastReceiver")
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, pendingIntent)
+    }
 
     companion object {
         private const val TAG = "GooglePlayServicesLocationProvider"

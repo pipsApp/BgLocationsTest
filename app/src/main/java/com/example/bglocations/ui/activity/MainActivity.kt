@@ -1,10 +1,15 @@
 package com.example.bglocations.ui.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.example.bglocations.broadcastreceiver.LocationUpdatesBroadcastReceiver
+import com.example.bglocations.location.GooglePlayServicesLocationProvider
 import com.example.bglocations.ui.theme.BgLocationsTheme
-import com.example.bglocations.worker.LocationCoroutineWorker
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -36,6 +43,9 @@ class MainActivity : ComponentActivity() {
                     PackageManager.PERMISSION_GRANTED
         }
 
+    @Inject lateinit var googlePlayServicesLocationProvider: GooglePlayServicesLocationProvider
+
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -61,7 +71,7 @@ class MainActivity : ComponentActivity() {
                             .padding(8.dp))
                     if (allPermissionsGranted) {
                         Button(onClick = {
-                            LocationCoroutineWorker.startWorker(this@MainActivity)
+                            requestLocationUpdatesViaBroadcastReceiver()
                         }) {
                             Text(text = "Start location updates")
                         }
@@ -69,5 +79,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    @RequiresPermission(
+        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
+    private fun requestLocationUpdatesViaBroadcastReceiver() {
+        Log.d("MainActivity", "requestLocationUpdatesViaBroadcastReceiver")
+        val intent = Intent(this, LocationUpdatesBroadcastReceiver::class.java)
+        googlePlayServicesLocationProvider.requestLocationUpdatesViaBroadcastReceiver(
+            PendingIntent.getBroadcast(this, 10, intent,
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
     }
 }
