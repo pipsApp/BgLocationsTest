@@ -34,12 +34,6 @@ class LocationCoroutineWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork")
-        try {
-            setForeground(createForegroundInfo())
-        } catch (e: Throwable) {
-            Log.e(TAG, "doWork, unable to create foreground info", e)
-            return Result.failure()
-        }
 
         val location = locationProvider.requestSingleUpdateWithTimeoutOrNull()
         return if (location == null) {
