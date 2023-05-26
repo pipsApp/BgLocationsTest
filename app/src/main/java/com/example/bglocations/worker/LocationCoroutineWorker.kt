@@ -83,9 +83,8 @@ class LocationCoroutineWorker @AssistedInject constructor(
             .setContentText("Requesting location updates")
             .setOngoing(true)
             .setVibrate(longArrayOf(0))
-            .setLocalOnly(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setSilent(true)
+            .setPriority(NotificationCompat.PRIORITY_MIN)
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .build()
 
