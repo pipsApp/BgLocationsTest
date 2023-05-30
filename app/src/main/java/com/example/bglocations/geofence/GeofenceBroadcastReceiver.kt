@@ -64,9 +64,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             setRequestId("1")
             setCircularRegion(location.latitude, location.longitude, geofenceRadius)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
-            setTransitionTypes(
-                Geofence.GEOFENCE_TRANSITION_EXIT or
-                        Geofence.GEOFENCE_TRANSITION_ENTER)
+            setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
         }.build()
 
         return GeofencingRequest.Builder().apply {
