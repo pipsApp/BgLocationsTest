@@ -61,6 +61,8 @@
             android:foregroundServiceType="location"
             tools:node="merge" />
 
+        <receiver android:name="com.example.bglocations.geofence.GeofenceBroadcastReceiver" />
+
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.example.bglocations.ui.activity
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.example.bglocations.geofence.GeofenceBroadcastReceiver
 import com.example.bglocations.ui.theme.BgLocationsTheme
-import com.example.bglocations.worker.LocationCoroutineWorker
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
                             .padding(8.dp))
                     if (allPermissionsGranted) {
                         Button(onClick = {
-                            LocationCoroutineWorker.startWorker(this@MainActivity)
+                            sendBroadcast(Intent(this@MainActivity, GeofenceBroadcastReceiver::class.java))
                         }) {
                             Text(text = "Start location updates")
                         }
