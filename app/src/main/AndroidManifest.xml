@@ -62,6 +62,7 @@
             tools:node="merge" />
 
         <receiver android:name="com.example.bglocations.broadcastreceivers.LocationUpdatesBroadcastReceiver" />
+        <receiver android:name="com.example.bglocations.broadcastreceivers.GeofenceBroadcastReceiver" />
 
     </application>
 

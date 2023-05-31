@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.example.bglocations.broadcastreceivers.GeofenceBroadcastReceiver
 import com.example.bglocations.broadcastreceivers.LocationUpdatesBroadcastReceiver
 import com.example.bglocations.location.LocationProvider
 import com.example.bglocations.ui.theme.BgLocationsTheme
@@ -72,6 +73,7 @@ class MainActivity : ComponentActivity() {
                         Button(onClick = {
 //                            LocationCoroutineWorker.startWorker(this@MainActivity)
                             requestLocationUpdatesViaBroadcastReceiver()
+                            sendBroadcast(Intent(this@MainActivity, GeofenceBroadcastReceiver::class.java))
                         }) {
                             Text(text = "Start location updates")
                         }
