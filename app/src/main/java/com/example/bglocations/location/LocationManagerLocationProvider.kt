@@ -1,6 +1,7 @@
 package com.example.bglocations.location
 
 import android.Manifest
+import android.app.PendingIntent
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
@@ -53,6 +54,14 @@ class LocationManagerLocationProvider(private val locationManager: LocationManag
 
     @RequiresPermission(
         anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
+    override fun requestLocationUpdatesViaBroadcastReceiver(pendingIntent: PendingIntent) {
+        locationManager.requestLocationUpdates(
+            bestEnabledProviderWithFineAccuracy ?: LocationManager.GPS_PROVIDER,
+            UPDATE_INTERVAL_LOCATION_PROVIDER, MIN_DISTANCE_LOCATION_PROVIDER, pendingIntent)
+    }
+
+    @RequiresPermission(
+        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
     private fun LocationManager.locationFlow(ignoreLastKnownLocation: Boolean,
                                              isWithTimeout: Boolean): Flow<Location> =
         callbackFlow {
@@ -86,7 +95,8 @@ class LocationManagerLocationProvider(private val locationManager: LocationManag
                 }
 
                 @Deprecated("Deprecated in Java")
-                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+                }
             }
 
             if (isWithTimeout) {
